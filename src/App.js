@@ -1,25 +1,48 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect } from 'react';
+import ContactsGrid from './components/ContactsGrid';
+import { QueryProvider } from './Context/QueryProvider';
+import { useContacts } from './hooks/useContacts';
+import { useQueryContext } from './Context/Query';
+import { ContactModalManager } from './components/ContactModal/ContactModalManager';
+import debounce from 'lodash/debounce';
+
+const ContactsContainer = () => {
+    const { query } = useQueryContext();
+    const { contacts, isLoading, error, fetchContacts } = useContacts();
+    const { handleCardClick, PopupComponent } = ContactModalManager();
+
+    useEffect(() => {
+        const debouncedFetch = debounce((searchQuery) => {
+            fetchContacts(searchQuery);
+        }, 300);
+
+        debouncedFetch(query);
+        return () => debouncedFetch.cancel();
+    }, [query, fetchContacts]);
+
+    return (
+        <>
+            {PopupComponent}
+            {error && (
+                <div className="text-red-500 text-center p-4">
+                    {error}
+                </div>
+            )}
+            <ContactsGrid
+                contacts={contacts}
+                handleCardClick={handleCardClick}
+                isLoading={isLoading}
+            />
+        </>
+    );
+};
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    return (
+        <QueryProvider>
+            <ContactsContainer />
+        </QueryProvider>
+    );
 }
 
 export default App;
