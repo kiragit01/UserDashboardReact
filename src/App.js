@@ -2,9 +2,9 @@ import React, { useEffect } from 'react';
 import ContactsGrid from './components/ContactsGrid';
 import { QueryProvider } from './Context/QueryProvider';
 import { useContacts } from './hooks/useContacts';
-import { useQueryContext } from './Context/Query';
 import { ContactModalManager } from './components/ContactModal/ContactModalManager';
 import debounce from 'lodash/debounce';
+import {useQueryContext} from "./hooks/useQueryContext";
 
 const ContactsContainer = () => {
     const { query } = useQueryContext();
